@@ -126,30 +126,93 @@ Lambda function : Run a Lambda function script based on S3 events.
 SNS topic : Fanout messages to systems for parallel processing or directly to people.
 SQS queue : Send notifications to an SQS queue to be read by a server.
 
+==========
+
+D: 10/03/2026
+
+Encryption : 
+
+In-Transit Encryption / At Flight Encryption : When data is in flught state / travelling state to s3 platform, data will be encrypted. Its AWS responsibility.
 
 
+Client Side Encryption : before uplaoding data to s3 platform, we cna use our own encry method and encrypt the data.. Customer responsibility..
+
+Server Side Side Encryption : When data is in s3 platform, we can apply encyption methods.
 
 
+SSE-S3 : Defualt encryption key.. 
+--> S3 generates and managed the key material..
+--> Whoever has access to s3 platform, they can decrypt the data.. No Additional permissions required..
+--> Suitable for public sharable data..
+--> No direct access to key/material to user.
+
+---
+
+SSE-KMS - DMK (Default Master Key)..
+--> KMS Service generates and manages the key material..
+--> Whoever has access to s3 platform, they can decrypt the data.. No Additional permissions required..
+--> No direct access to key/material to user.
+--> We cannot make object public, if object is encrypted using KMS key..
+
+---
+
+SSE-KMS - CMK (Customer Managed Key)..
+--> Customer has to create the KMS key and KMS Service manages the key material.. We can use this key to multiple AWS services
+--> Along with the S3 Service access, User/Role should have KMS Key usage permissions to decrypt the data..
+--> No direct access to key/material to user. But customer can rotate the key material..
+--> We cannot make object public, if object is encrypted using KMS key..
+
+---
+
+SSE-KMS - C (Customer Provided Key)..
+--> Customer has to create the KMS key and Customer has to manages the key material.. We can use this key with multiple AWS services
+--> Along with the S3 Service access, User/Role should have KMS Key usage permissions to decrypt the data..
+--> Customer can manage / rotate the key material.
+--> We cannot make object public, if object is encrypted using KMS key..
 
 
+=====
+
+Symmetric Key : A single key will be used for encryption and decryption purposes. : ** S3
+Asymetric key : A public and krivate key pair used for encrypting and decrypting data. signing and verifying messages.
 
 
+Key creation steps: 
+
+Step 1 : Symmetric Key.. "Encryption and Decryption"..
+
+Step 2 : Privide name and descr
+
+Step 3 : Key administrative permissions : Avinash_T
+
+Step 4 : Key usage permissions : Avinash_T
+
+Step 5 : Review policy and create key
 
 
+======
+
+Static Website : S3 supports static website hosting
+
+Bucket Name = Domain Name
+
+--> NO need to run our server 24x7 for our static website
+--> Defualt, our website gets S3 performance
+
+3500 PUT Operations per Second		--> Upload
+5500 GET Operations per Second		--> Download/access/get
+
+--> We have to make our s3 bucket public
+--> It runs with http protocol 
+--> Integrate with cloudfront for https and Private buckets
 
 
+http status codes:
 
-
-
-
-
-
-
-
-
-
-
-
+2XX : ok/success
+3XX : Redirect
+4XX : Client Side error
+5XX : Server Side error
 
 
 
