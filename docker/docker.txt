@@ -1,0 +1,82 @@
+
+
+Adv of COntainers
+
+--> Consistent Environment : Eliminated "it works on my machine"
+--> Fast Setup : clone  repo, docker run / docker compose up
+--> Dependency isolation : App 1 needs python 3.9 and app 2 needs python 3.14.. - No Conflict
+
+--> Lower Infra Wastage
+--> Portability : You can move your container from anywhere to anywhere.
+
+---
+
+Docker : Opensource platform for building, shipping and runing containerised applications.
+
+
+2008 --> dotCloud founded by solomon hykes
+2013 --> Docker 0.1 releases
+2014 --> AWS, Azure, GCP officially docker support
+
+---
+
+Docker alternative : podman / containerd / cri-o / kaniko
+
+
+Dont install docker using root user.
+
+
+docker --version
+
+sudo dnf install docker -y
+
+sudo systemctl enable docker --now
+
+sudo systemctl status docker
+
+sudo usermod -aG docker $USER
+
+---
+
+docker images					--> Lists local images
+docker ps						--> Lists running contianers
+docker ps -a					--> List the all container running/exited
+docker run nginx:1.28			--> Runs a container with nginx image, tag 1.28 (foregound)
+docker run -d nginx:1.28		--> runs nginx 1.28 in detached mode
+
+docker run -d --name my-web nginx:1.28		--> run nginx 1.28 in detached mode with specific name
+
+docker run --rm --name test-delete nginx	--> it removes when container stops
+
+docker stop <container-id>/<container-name>
+docker start <container-id>/<container-name>
+
+docker kill <container-id>/<container-name>
+
+stop : graceful (SIGTERM)
+kill : immediate (SIGKILL)
+
+
+docker rm <container-id>/<container-name>		--> container will be removed
+
+----
+
+EC2 Instance : Host
+Container : container
+
+we have to map host port with container port to get the container output.
+
+docker run -d -p 80:80 nginx:1.28
+
+netstat -tulnp 
+netstat -tulnp | grep 8080
+
+docker run -d -p 8080:80 nginx:1.28
+
+docker run -d -p 8888:80 -p 8880:443 nginx:1.28
+
+
+
+
+
+
