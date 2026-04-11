@@ -177,7 +177,6 @@ LoadBalancer: We can use AWS Classic load balancer to deliver our workload to ou
 
 ----
 
-
 CPU: 
 m : millicores
 1 CPU = 1000 millicores
@@ -200,6 +199,49 @@ OOM - Out of Memory
 --> Large in-memory operations
 --> Sudden spike in traffic to the pod
 --> Application level memory leak (Invenstigation needed)
+
+
+
+eksctl utils associate-iam-oidc-provider --region ap-south-1 --cluster ekswithavinash --approve
+
+----
+
+Namespace = Logical isolation (Not Physical)
+Same resource names allowed across namespaces.
+
+--> Multi-tenant : Multiple teams can use one cluster without involving other teams work..
+--> Resource Limits : We can apply resource quotas for proper worklaod management across the teams..
+
+default : our worklooad runs here, if we dont define any namespace while deploying.. 
+kube-system : k8s backend / system components / all core components runs here.. 
+kube-public : Publicly readable namespaces for cluster wide information..
+kube-node-lease : manages the node heartbeat/ATT beat to track node available.. (EKS)
+
+kubectl get pods -n kube-system
+
+kubectl get pods					--> Default namespace picks
+
+
+kubectl create ns <ns-name>
+
+imparative : We can pass instructionsto k8s on the go.
+
+kubectl create ns <name>
+** kubectl scale deployment <deployment-name> --replicas=3
+** kubectl set image deployemnt/<deployment-name> nginx=nginx:latest
+
+Declarative : we can do the changes in the manifest file, then we can apply it.
+
+---
+
+To set a namespace as default namespace, we need to adjust the context..
+
+kubectl config set-context --current --namespace=dev-namespace
+
+
+
+
+
 
 
 
