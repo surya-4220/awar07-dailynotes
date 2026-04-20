@@ -575,6 +575,138 @@ finally:
 10 pods -> canary
 
 
+==========
+
+Deployment Controlls
+
+eksctl utils associate-iam-oidc-provider --region ap-south-1 --cluster ekswithavinash --approve
+
+
+Node Affinity : Choose which nodes pods prefer/require. 
+Control which nodes you pods should run on, Based on "node labels".
+
+kubectl get nodes
+kubectl get nodes --show-labels
+kubectl describe nodes <name>
+
+kubectl get pods -o wide
+
+kubectl label nodes <node-name> disktype=ssd
+
+We have 2 options on Node Affinity :
+
+1. Hard Rule: Pod must run on a matching node, if no match found, it stays pending.
+requiredDuringScheduling
+
+2. Soft Rule : Pod prefer matching nodes but it will run even if no node has the label.
+preferredDuringScheduling
+
+IgnoreDuringExecution : Running pods wont be evicted if labels change.
+
+
+ip-192-168-3-17.ap-south-1.compute.internal    Ready    <none>   5m13s   v1.34.6-eks-bbe087e
+ip-192-168-36-39.ap-south-1.compute.internal   Ready    <none>   5m12s   v1.34.6-eks-bbe087e
+
+
+kubectl label nodes ip-192-168-3-17.ap-south-1.compute.internal disktype=ssd
+
+
+kubectl label nodes ip-192-168-3-17.ap-south-1.compute.internal disktype=ssd
+
+kubectl describe nodes ip-192-168-3-17.ap-south-1.compute.internal
+
+=====
+
+
+Pod Affinity : pods stick together on the same node.  Both pods needs ultra low latency, then we can prefer.
+
+
+Pod Anti-Affinity : pods cannot run on the same node. 
+
+=====
+
+Taint (node) : like a bus seat, marked as "reserved"
+Tolaration (pod) : the special pass that lets the user to sit on "reserved" seat.
+
+NoSchedule : New pods wont be scheduled here
+PreferNoSchedule : k8s avaoids scheduling here, but its not strict
+NoExecute : Existing pods without tolaration are evicted.
+
+Step 1 : add a label to a Node, so that we can force our pod to run on that specific node using "nodeselector"
+
+kubectl label nodes ip-192-168-3-17.ap-south-1.compute.internal disktype=ssd
+
+Step 2 : taint the same node.
+
+kubectl taint nodes ip-192-168-3-17.ap-south-1.compute.internal role=db:NoSchedule
+
+to remove taint: kubectl taint nodes ip-192-168-3-17.ap-south-1.compute.internal role=db:NoSchedule-
+
+=====
+
+Node Drain: 
+
+Drain evicts all pods from a node gracefully. 
+Used when:
+Node Maintenance (patch / h/w upgrade)
+Decomissioning a node
+cluster upgrades
+
+kubectl drain <node-name> --ignore-daemonsets --delete-emptydir-data --timeout=120s
+
+kubectl describe nodes ip-192-168-3-17.ap-south-1.compute.internal
+
+kubectl drain ip-192-168-3-17.ap-south-1.compute.internal --ignore-daemonsets --delete-emptydir-data --timeout=120s --force
+
+kubectl uncordon ip-192-168-3-17.ap-south-1.compute.internal
+
+Restart the deployment to rebalance pods:
+kubectl rollout restart deployment nginx-deployment
+
+==========
+
+Liveness Probe : Is the container alive.? (if fails: Container restarts)
+
+Readiness Probe : Is the container ready to serve traffic.? (if fails: Container remove from service)
+
+Startup probe : Has the container finished starting.? (if fails: Container killed and restarted)
+
+
+initialDelaySeconds : Wait before first check
+periodSeconds : check every "x" seconds
+failureThreshold : Restart after "x" consecutives failures.
+
+
+pods wont receive traffic untill the readiness probe passes.
+
+Startup probe is useful for slow-start application.. 
+** liveness and readiness probes wont start untill startup probe success.
+
+===========
+
+minReadySeconds : How long a new pod must run without crashing before its considered available.
+
+progressDeadlineSeconds : Max time for a deployment to make progress. If exceeds, deployment is marked as failed.
+
+terminationGracePeriodSeconds : Time given to a pod to shutdown gracefully before being killed.
+
+=========
+
+pdb : pod distruption budget :  Its used to protect application availability during voluntary distruption. 
+
+Voluntary distruption means:
+node drain
+cluster upgrade
+autoscaler removing the nodes
+manual pod eviction
+
+** it does not protect against sudden crashes like; node failure / pod failure.
+
+
+
+
+
+
 
 
 
