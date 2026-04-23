@@ -786,6 +786,137 @@ Partition key : StudentId
 
 ===============
 
+eksctl create cluster --name=ekswithavinash --version 1.34 --region ap-south-1 --zones=ap-south-1a,ap-south-1b --nodegroup-name mynodegroup --node-type c7i-flex.large --nodes 2 --node-ami-family=AmazonLinux2023 --managed
+
+
+eksctl create cluster --name=ekswithavinash-uat --version 1.34 --region ap-south-1 --zones=ap-south-1a,ap-south-1b --nodegroup-name mynodegroup --node-type c7i-flex.large --nodes 2 --node-ami-family=AmazonLinux2023 --managed
+
+
+Kubeconfig file location :  ~/.kube/config
+
+kubectl config get-contexts			--> identify which cluster we are poining now.
+
+Add friendly name to the clusters:
+
+aws eks update-kubeconfig --region ap-south-1 --name ekswithavinash --alias dev-cluster
+
+aws eks update-kubeconfig --region ap-south-1 --name ekswithavinash-uat --alias uat-cluster
+
+kubectl config use-context dev-cluster			--> Switch to Dev-cluster 
+
+
+kubectl --context=uat-cluster get pods -n kube-system	--> Run commands without switching / temp
+
+kubectl --context=dev-cluster get pods -n kube-system	--> Run commands without switching / temp
+
+
+--
+
+Set default namspace for a context (no need to pass "-n uat-namespace" after this config)
+
+kubectl config set-context dev-cluster --namespace=uat-namespace
+
+--
+
+kubectl config rename-context dev-name-context dev-new-name-context
+
+---
+
+To cleanup a context:
+
+kubectl config delete-context ekswithavinash
+
+kubectl config delete-cluster ekswithavinash
+
+kubectl config delete-user ekswithavinash
+
+
+kubeconfig file structure:
+
+
+current-context: dev-cluster		--> active context
+
+clusters:
+	- name: dev-cluster
+		cluster:
+			server: https://djskfgsdjhg.region.eks.amazon.com
+			cert-authory-data: djkghdfjgdfjgfdj
+	
+	- name: uat-cluster
+		cluster:
+			server: https://djskfgsdjhg.region.eks.amazon.com
+			cert-authory-data: djkghdfjgdfjgfdj
+
+----
+
+
+aws eks update-kubeconfig --region ap-south-1 --name ekswithavinash --alias dev-cluster
+
+
+AWS EKS access works in 2 layers
+
+Layer 1 : AWS IAM : Can this IAM identity Reach the eks API Server.?
+
+layer 2 : K8s RBAC : Once inside, what can this identity do.?
+
+
+---
+
+aws-auth configmap : IAM roles/users mapped inside a k8s config map. (eks cluster version < 1.30)
+
+EKS Access Entries : IAM Users/roles mapped via aws api/console. *Recommended
+
+
+--
+
+AmazonEKSAdminPolicy : Provides only workload management, DOnt provide eks node management.
+AmazonEKSClusterAdminPolicy : Workload access and node access also.
+
+---
+
+
+kubectl auth can-i get pods
+
+kubectl auth can-i get nodes
+
+kubectl auth can-i delete pods
+
+kubectl auth can-i --list
+
+
+=====================
+
+
+Observability / o11y : 
+
+What is happening.?   -> Metrics (numbers, graphs)
+Why is it happening.? -> Logs   (text record of an event)
+Where did it break.?  -> Traces (request flow across services)
+
+1. Select the EKS Node's IAM role and attach "CloudWatchAgentServerPolicy"
+
+eksctl create addon --name amazon-cloudwatch-observability --cluster ekswithavinash --region ap-south-1
+
+Component 1 : CW Agent : runs as a daemon in every single node. (Node & pod & container level metrics)
+
+Component 2 : FLuent Bit : A lightweight log processor, THis also run as daemonset. 
+
+Component 3 : cloudwatch controller manager : manages the cw agent configuration and status.
+
+---
+
+CW o11y agent helps with 4 types of logs.
+
+/aws/containerinsights/<cluster-name>/application : Displays everything about applicvation containers (console.log / print / logger.info / logger.error) from pod.
+
+/aws/containerinsights/<cluster-name>/dataplane : logs from k8s system components running on worker nodes. (kubelet, kube-proxy, containerd)
+
+/aws/containerinsights/<cluster-name>/host : THis contains system level logs from thr ec2 worker nodes. 
+
+/aws/containerinsights/<cluster-name>/performance : perf of node and pod, container logs.. 
+
+
+---
 
 
 
