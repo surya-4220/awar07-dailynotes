@@ -1022,16 +1022,53 @@ kubectl proxy --address='0.0.0.0' --disable-filter=true
 
 http://<instance-public-ip>:8001
 
+========
 
 
+ArgoCD : 
+
+eksctl utils associate-iam-oidc-provider --region ap-south-1 --cluster ekswithavinash --approve
+
+its a GitOps continuous delivery tool for K8s. It watches git repo and automatically keeps your cluster in sync with git.
 
 
+Git repo (Source of Truth)
+ArgoCD watches for changes (every 3 min)
+Detect drift between git state and cluster state
+sync the cluster to match git sessings - automatically / Manually.
 
 
+Argo Architecture:
+
+ArgoCD
+
+API Server 		--> UI / CLI / CI requests
+Repo Server 	--> clones + render manifest
+App Controller 	--> compares + sync
+Redis 			--> Caching
 
 
+Application : links gitrepo path to a target cluster and namespace.
 
 
+Install : 
+kubectl create namespace argocd
+kubectl apply -n argocd --server-side --force-conflicts -f https://raw.githubusercontent.com/argoproj/argo-cd/stable/manifests/install.yaml
+
+
+kubectl patch svc argocd-server -n argocd -p '{"spec": {"type": "LoadBalancer"}}'
+
+kubectl -n argocd get secret argocd-initial-admin-secret -o jsonpath="{.data.password}" | base64 -d; echo
+
+
+---
+
+
+ignoreDifferences:
+- group: app
+	kind : Deployment
+	jsonPointers:
+ 	 - /spec/replicas
 
 
 
