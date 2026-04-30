@@ -91,15 +91,32 @@ Actions : Its a reusable piece of code that does a specific task. Using a specia
 actions/checkout@v4	--> checks out our repo code.
 actions/setup-node@v6 --> Setup nodejs
 
+=======
+
+
+- uses: actions/setup-node@v6
+
+- uses: actions/checkout@v6
+
+actions : official namespace provided by github
+checkout : This will fetches code in the workflow to access.
+@v6
 
 
 
+- name: checkour repo
+  uses: actions/checkout@v6
+- name: run build
+  run : npm build && npm run build
+  
+========
 
+workflow variables : $NAME, $VAR_NAME
+Config Varibales : ${{ vars.VAR_NAME }}
+context variables : 
+https://docs.github.com/en/actions/reference/workflows-and-actions/contexts
 
-
-
-
-
+=====
 
 
 
