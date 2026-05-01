@@ -118,6 +118,69 @@ https://docs.github.com/en/actions/reference/workflows-and-actions/contexts
 
 =====
 
+TO access AWS environment from GHA using OIDC method (Secured)
+
+Step 1 : create OIDC provider with below info. 
+
+provider: token.actions.githubusercontent.com
+audience: sts.amazonaws.com
+
+Step 2 : Create an IAM role for GHA.
+
+Click on create role and then choose "web identity"
+
+provider: token.actions.githubusercontent.com
+audience: sts.amazonaws.com
+GitHub organization : <provide github username>
+
+Step 3 : Add required polocies to acess resources from GHA
+
+Step 4 P Create and grab the role arn
+
+role : arn:aws:iam::655700896650:role/GHA-Role
+
+=======
+
+github hosted runner : GitHub gives a VM --> THis VM runs our Job --> Destroys the VM
+--> max a job can run for 6 hours
+
+Self-Hosted Runner : We can setup our own machine --> Github sends jobs to it --> Machiebe stays alive.
+--> Can access private VPC / Databses
+--> We can have pre-installed tools (docker, kubectl)
+--> We can use IAM roles without storing any credentials at GHA.
+--> We can consider for jobs that runs more than 6 hrs period.
+
+
+sudo dnf update -y
+
+dnf install dotnet-sdk-8.0 libicu -y
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
