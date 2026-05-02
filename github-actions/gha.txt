@@ -156,7 +156,10 @@ sudo dnf update -y
 dnf install dotnet-sdk-8.0 libicu -y
 
 
+./run.sh
 
+sudo ./run.sh install
+sudo ./run.sh start
 
 
 
